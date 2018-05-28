@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/url"
 	"os"
+	"context"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/amacneil/dbmate/pkg/dbmate"
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli"
@@ -13,13 +14,19 @@ import (
 
 func main() {
 	loadDotEnv()
+	lambda.Start(LambdaHandler)
+}
 
+func LambdaHandler(ctx context.Context) (error) {
 	app := NewApp()
-	err := app.Run(os.Args)
+	// err := app.Run(os.Args)
+	err := app.Run([]string{"dbmate", "up"})
+	
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
-		os.Exit(1)
+		return err
 	}
+
+	return nil
 }
 
 // NewApp creates a new command line app
